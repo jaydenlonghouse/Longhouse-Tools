@@ -117,3 +117,4 @@ supabase/
   docs/         SUPABASE_SETUP.md, TOOL_INTEGRATION.md
   seed.sql
 ```
+# Longhouse-Tools
