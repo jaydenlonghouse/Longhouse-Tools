@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import DepartmentTags from './DepartmentTags.jsx'
 import ToolThumbnail from './ToolThumbnail.jsx'
 
-export default function ToolCard({ tool, onRequestFeature }) {
+export default function ToolCard({ tool, onRequestFeature, showKindBadge = false }) {
   return (
     <article className="flex flex-col rounded-2xl border border-brand-100 bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="p-4 pb-0">
@@ -17,7 +17,14 @@ export default function ToolCard({ tool, onRequestFeature }) {
         </a>
       </div>
       <div className="flex flex-1 flex-col p-5 pt-4">
-        <h2 className="text-lg font-semibold text-ink-900">{tool.name}</h2>
+        <div className="flex flex-wrap items-start gap-2">
+          <h2 className="text-lg font-semibold text-ink-900">{tool.name}</h2>
+          {showKindBadge && tool.kind === 'gpt' ? (
+            <span className="inline-flex shrink-0 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-800">
+              GPT
+            </span>
+          ) : null}
+        </div>
         <DepartmentTags departments={tool.departments} className="mt-2" />
         <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600 line-clamp-3">
           {tool.description}

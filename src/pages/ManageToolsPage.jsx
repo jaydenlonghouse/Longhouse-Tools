@@ -28,6 +28,7 @@ function toolToFormValues(tool) {
     createdBy: tool.created_by ?? '',
     departmentIds: tool.department_ids ?? [],
     tierRoleIds: tool.tier_role_ids ?? [],
+    kind: tool.kind ?? 'tool',
   }
 }
 
@@ -136,6 +137,7 @@ export default function ManageToolsPage({ onNavigate }) {
       tierRoleIds: values.tierRoleIds,
       createdBy: values.createdBy,
       isActive: values.isActive,
+      kind: values.kind,
     }
 
     const { error } =
@@ -255,7 +257,18 @@ export default function ManageToolsPage({ onNavigate }) {
                       }`}
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-ink-900">{tool.name}</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate font-medium text-ink-900">{tool.name}</p>
+                          <span
+                            className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                              tool.kind === 'gpt'
+                                ? 'bg-violet-100 text-violet-800'
+                                : 'bg-brand-100 text-brand-800'
+                            }`}
+                          >
+                            {tool.kind === 'gpt' ? 'GPT' : 'Tool'}
+                          </span>
+                        </div>
                         <p className="truncate text-xs text-ink-500">{tool.slug}</p>
                         {creatorLabel(tool.created_by) ? (
                           <p className="mt-0.5 truncate text-xs text-ink-400">

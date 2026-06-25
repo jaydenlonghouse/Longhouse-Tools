@@ -50,6 +50,15 @@ const mockToolMeta = new Map([
       tier_role_ids: ['role-specialist', 'role-results-manager', 'role-department-head', 'role-leadership'],
     },
   ],
+  [
+    '4',
+    {
+      is_active: true,
+      created_by: 'mock-user-2',
+      department_ids: ['dept-advertising', 'dept-social-media'],
+      tier_role_ids: ['role-specialist', 'role-results-manager', 'role-department-head'],
+    },
+  ],
 ])
 
 function getMockToolMeta(toolId) {
@@ -109,6 +118,7 @@ export function getMockAdminTools() {
       thumbnail_url: tool.thumbnail_url ?? null,
       is_active: meta.is_active,
       created_by: meta.created_by,
+      kind: tool.kind ?? 'tool',
       department_ids: meta.department_ids,
       tier_role_ids: meta.tier_role_ids,
     }
@@ -127,6 +137,7 @@ export function addMockTool({
   tierRoleIds,
   createdBy,
   isActive = true,
+  kind = 'tool',
 }) {
   const id = `mock-tool-${Date.now()}`
   const deptNames = (departmentIds ?? [])
@@ -142,6 +153,7 @@ export function addMockTool({
     icon,
     url,
     sort_order: sortOrder ?? MOCK_TOOLS.length + 1,
+    kind: kind === 'gpt' ? 'gpt' : 'tool',
     departments: deptNames,
     created_by_name: creator?.display_name || creator?.email || 'Demo User',
     thumbnail_url: thumbnailUrl || null,
@@ -172,6 +184,7 @@ export function updateMockTool(
     tierRoleIds,
     createdBy,
     isActive,
+    kind = 'tool',
   },
 ) {
   const index = MOCK_TOOLS.findIndex(t => t.id === toolId)
@@ -190,6 +203,7 @@ export function updateMockTool(
     url,
     icon,
     sort_order: sortOrder ?? MOCK_TOOLS[index].sort_order,
+    kind: kind === 'gpt' ? 'gpt' : 'tool',
     departments: deptNames,
     created_by_name: creator?.display_name || creator?.email || MOCK_TOOLS[index].created_by_name,
     thumbnail_url: thumbnailUrl || null,

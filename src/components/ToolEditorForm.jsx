@@ -28,6 +28,7 @@ const EMPTY = {
   createdBy: '',
   departmentIds: [],
   tierRoleIds: [],
+  kind: 'tool',
 }
 
 export default function ToolEditorForm({
@@ -61,6 +62,7 @@ export default function ToolEditorForm({
   const [createdBy, setCreatedBy] = useState(EMPTY.createdBy)
   const [selectedDeptIds, setSelectedDeptIds] = useState(EMPTY.departmentIds)
   const [selectedTierIds, setSelectedTierIds] = useState(EMPTY.tierRoleIds)
+  const [kind, setKind] = useState(EMPTY.kind)
 
   useEffect(() => {
     const v = { ...EMPTY, ...initialValues }
@@ -83,6 +85,7 @@ export default function ToolEditorForm({
     setCreatedBy(v.createdBy || '')
     setSelectedDeptIds(v.departmentIds ?? [])
     setSelectedTierIds(v.tierRoleIds ?? [])
+    setKind(v.kind === 'gpt' ? 'gpt' : 'tool')
   }, [initialValues, mode])
 
   useEffect(() => {
@@ -169,17 +172,23 @@ export default function ToolEditorForm({
       createdBy,
       departmentIds: selectedDeptIds,
       tierRoleIds: selectedTierIds,
+      kind,
     })
   }
 
+  const isGpt = kind === 'gpt'
   const submitLabel =
     status === 'submitting'
       ? mode === 'edit'
         ? 'Saving…'
-        : 'Creating…'
+        : isGpt
+          ? 'Creating GPT…'
+          : 'Creating…'
       : mode === 'edit'
         ? 'Save changes'
-        : 'Create tool'
+        : isGpt
+          ? 'Create GPT'
+          : 'Create tool'
 
   const activePreviewUrl = removeThumbnail
     ? ''
@@ -200,7 +209,7 @@ export default function ToolEditorForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-ink-900">
-          {mode === 'edit' ? 'Edit tool' : 'New tool'}
+          {mode === 'edit' ? 'Edit entry' : 'New entry'}
         </h2>
         {onCancel ? (
           <button
@@ -225,6 +234,40 @@ export default function ToolEditorForm({
           <span className="block text-xs text-ink-500">Uncheck to hide this tool from the hub</span>
         </span>
       </label>
+
+      <fieldset>
+        <legend className="block text-sm font-medium text-ink-800">Type</legend>
+        <div className="mt-2 flex flex-wrap gap-3">
+          <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-brand-200 px-4 py-2.5 has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+            <input
+              type="radio"
+              name="tool-kind"
+              value="tool"
+              checked={kind === 'tool'}
+              onChange={() => setKind('tool')}
+              className="h-4 w-4 border-brand-300 text-brand-800 focus:ring-brand-500"
+            />
+            <span>
+              <span className="block text-sm font-medium text-ink-900">Tool</span>
+              <span className="block text-xs text-ink-500">Internal app or utility</span>
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-brand-200 px-4 py-2.5 has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+            <input
+              type="radio"
+              name="tool-kind"
+              value="gpt"
+              checked={kind === 'gpt'}
+              onChange={() => setKind('gpt')}
+              className="h-4 w-4 border-brand-300 text-brand-800 focus:ring-brand-500"
+            />
+            <span>
+              <span className="block text-sm font-medium text-ink-900">GPT</span>
+              <span className="block text-xs text-ink-500">Custom GPT from your collection</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
 
       <div>
         <label htmlFor="tool-name" className="block text-sm font-medium text-ink-800">

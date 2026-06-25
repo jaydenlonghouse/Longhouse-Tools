@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
 import ToolGrid from '../components/ToolGrid.jsx'
+import ToolCatalogToolbar from '../components/ToolCatalogToolbar.jsx'
 import { useTools } from '../hooks/useTools.js'
 import { captureDeniedFromUrl, consumeDeniedNotice, formatToolSlug } from '../lib/deniedUtils.js'
+import { catalogResultLabel, filterCatalogTools } from '../lib/toolCatalogUtils.js'
 
 export default function HubPage({ onRequestFeature, onSubmitBug }) {
   const { data: tools, isLoading, error } = useTools()
   const [deniedSlug, setDeniedSlug] = useState(null)
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('all')
 
   useEffect(() => {
     captureDeniedFromUrl()
@@ -19,6 +23,19 @@ export default function HubPage({ onRequestFeature, onSubmitBug }) {
     const match = tools?.find(t => t.slug === deniedSlug)
     return match?.name ?? formatToolSlug(deniedSlug)
   }, [deniedSlug, tools])
+
+  const filteredTools = useMemo(
+    () => filterCatalogTools(tools, category, query),
+    [tools, category, query],
+  )
+
+  const hasActiveFilters = category !== 'all' || query.trim().length > 0
+  const resultLabel = catalogResultLabel(filteredTools.length, category)
+
+  function clearFilters() {
+    setQuery('')
+    setCategory('all')
+  }
 
   return (
     <>
@@ -49,7 +66,7 @@ export default function HubPage({ onRequestFeature, onSubmitBug }) {
             Tools
           </h1>
           <p className="mt-1 text-sm text-ink-600 sm:text-base">
-            Internal apps and utilities for the Longhouse team.
+            Internal apps, utilities, and GPTs for the Longhouse team.
           </p>
         </div>
         <button
@@ -61,11 +78,28 @@ export default function HubPage({ onRequestFeature, onSubmitBug }) {
         </button>
       </header>
 
+      {!isLoading && !error && (tools?.length ?? 0) > 0 ? (
+        <ToolCatalogToolbar
+          query={query}
+          onQueryChange={setQuery}
+          category={category}
+          onCategoryChange={setCategory}
+          resultCount={filteredTools.length}
+          resultLabel={resultLabel}
+        />
+      ) : null}
+
       <ToolGrid
-        tools={tools}
+        tools={filteredTools}
         isLoading={isLoading}
         error={error}
         onRequestFeature={onRequestFeature}
+        hasCatalogFilters={hasActiveFilters}
+        totalToolCount={tools?.length ?? 0}
+        query={query}
+        category={category}
+        onClearFilters={clearFilters}
+        showKindBadge={category === 'all'}
       />
     </>
   )

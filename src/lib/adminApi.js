@@ -138,6 +138,7 @@ export async function fetchToolsForAdmin() {
       thumbnail_url,
       is_active,
       created_by,
+      kind,
       tool_departments ( department_id ),
       tool_access_tiers ( role_id )
     `,
@@ -159,6 +160,7 @@ export async function fetchToolsForAdmin() {
     thumbnail_url: tool.thumbnail_url,
     is_active: tool.is_active,
     created_by: tool.created_by,
+    kind: tool.kind ?? 'tool',
     department_ids: (tool.tool_departments ?? []).map(td => td.department_id),
     tier_role_ids: (tool.tool_access_tiers ?? []).map(tat => tat.role_id),
   }))
@@ -295,6 +297,7 @@ export async function createTool({
   departmentIds,
   tierRoleIds,
   createdBy,
+  kind = 'tool',
 }) {
   if (useOfflineDemo) {
     const tool = addMockTool({
@@ -308,6 +311,7 @@ export async function createTool({
       departmentIds,
       tierRoleIds,
       createdBy,
+      kind,
     })
     return { data: tool, error: null }
   }
@@ -326,6 +330,7 @@ export async function createTool({
       thumbnail_url: thumbnailUrl?.trim() || null,
       created_by: createdBy,
       is_active: true,
+      kind: kind === 'gpt' ? 'gpt' : 'tool',
     })
     .select('id')
     .single()
@@ -374,6 +379,7 @@ export async function updateTool({
   tierRoleIds,
   createdBy,
   isActive,
+  kind = 'tool',
 }) {
   if (useOfflineDemo) {
     const tool = updateMockTool(toolId, {
@@ -388,6 +394,7 @@ export async function updateTool({
       tierRoleIds,
       createdBy,
       isActive,
+      kind,
     })
     if (!tool) {
       return { data: null, error: { message: 'Tool not found.' } }
@@ -409,6 +416,7 @@ export async function updateTool({
       thumbnail_url: thumbnailUrl?.trim() || null,
       created_by: createdBy,
       is_active: isActive !== false,
+      kind: kind === 'gpt' ? 'gpt' : 'tool',
     })
     .eq('id', toolId)
 

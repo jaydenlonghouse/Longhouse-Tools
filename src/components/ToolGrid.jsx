@@ -1,5 +1,6 @@
 import ToolCard from './ToolCard.jsx'
 import EmptyToolsState from './EmptyToolsState.jsx'
+import ToolCatalogEmptyState from './ToolCatalogEmptyState.jsx'
 
 function ToolCardSkeleton() {
   return (
@@ -21,7 +22,18 @@ function ToolCardSkeleton() {
   )
 }
 
-export default function ToolGrid({ tools, isLoading, error, onRequestFeature }) {
+export default function ToolGrid({
+  tools,
+  isLoading,
+  error,
+  onRequestFeature,
+  hasCatalogFilters = false,
+  totalToolCount = 0,
+  query = '',
+  category = 'all',
+  onClearFilters,
+  showKindBadge = false,
+}) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -40,14 +52,29 @@ export default function ToolGrid({ tools, isLoading, error, onRequestFeature }) 
     )
   }
 
-  if (!tools?.length) {
+  if (totalToolCount === 0) {
     return <EmptyToolsState />
+  }
+
+  if (!tools?.length) {
+    return (
+      <ToolCatalogEmptyState
+        query={query}
+        category={category}
+        onClearFilters={hasCatalogFilters ? onClearFilters : undefined}
+      />
+    )
   }
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {tools.map(tool => (
-        <ToolCard key={tool.id} tool={tool} onRequestFeature={onRequestFeature} />
+        <ToolCard
+          key={tool.id}
+          tool={tool}
+          onRequestFeature={onRequestFeature}
+          showKindBadge={showKindBadge}
+        />
       ))}
     </div>
   )
