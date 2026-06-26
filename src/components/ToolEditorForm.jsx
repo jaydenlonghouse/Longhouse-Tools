@@ -452,22 +452,20 @@ export default function ToolEditorForm({
           {departments.map(d => {
             const checked = selectedDeptIds.includes(d.id)
             return (
-              <label
+              <button
                 key={d.id}
-                className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                type="button"
+                role="checkbox"
+                aria-checked={checked}
+                onClick={() => toggleDept(d.id)}
+                className={`rounded-full border px-3 py-1.5 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
                   checked
                     ? 'border-brand-600 bg-brand-800 text-white'
                     : 'border-brand-200 bg-white text-ink-700 hover:border-brand-300'
                 }`}
               >
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  checked={checked}
-                  onChange={() => toggleDept(d.id)}
-                />
                 {d.name}
-              </label>
+              </button>
             )
           })}
         </div>
