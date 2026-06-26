@@ -1,11 +1,18 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Heart } from 'lucide-react'
 import DepartmentTags from './DepartmentTags.jsx'
 import ToolThumbnail from './ToolThumbnail.jsx'
 
-export default function ToolCard({ tool, onRequestFeature, showKindBadge = false }) {
+export default function ToolCard({
+  tool,
+  onRequestFeature,
+  showKindBadge = false,
+  isFavorited = false,
+  onToggleFavorite,
+  favoritePending = false,
+}) {
   return (
     <article className="flex flex-col rounded-2xl border border-brand-100 bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="p-4 pb-0">
+      <div className="relative p-4 pb-0">
         <a
           href={tool.url}
           target="_blank"
@@ -15,6 +22,26 @@ export default function ToolCard({ tool, onRequestFeature, showKindBadge = false
         >
           <ToolThumbnail tool={tool} />
         </a>
+        {onToggleFavorite ? (
+          <button
+            type="button"
+            onClick={() => onToggleFavorite(tool.id)}
+            disabled={favoritePending}
+            aria-pressed={isFavorited}
+            aria-label={isFavorited ? `Remove ${tool.name} from favorites` : `Favorite ${tool.name}`}
+            className={`absolute right-6 top-6 inline-flex h-9 w-9 items-center justify-center rounded-full border bg-white/95 shadow-sm backdrop-blur transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-60 ${
+              isFavorited
+                ? 'border-red-200 text-red-500 hover:bg-red-50'
+                : 'border-brand-100 text-ink-400 hover:border-brand-200 hover:text-red-500'
+            }`}
+          >
+            <Heart
+              size={18}
+              className={isFavorited ? 'fill-current' : ''}
+              aria-hidden
+            />
+          </button>
+        ) : null}
       </div>
       <div className="flex flex-1 flex-col p-5 pt-4">
         <div className="flex flex-wrap items-start gap-2">

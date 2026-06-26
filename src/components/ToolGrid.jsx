@@ -33,6 +33,9 @@ export default function ToolGrid({
   category = 'all',
   onClearFilters,
   showKindBadge = false,
+  isFavorited,
+  onToggleFavorite,
+  favoritePending = false,
 }) {
   if (isLoading) {
     return (
@@ -74,6 +77,9 @@ export default function ToolGrid({
           tool={tool}
           onRequestFeature={onRequestFeature}
           showKindBadge={showKindBadge}
+          isFavorited={isFavorited?.(tool.id) ?? false}
+          onToggleFavorite={onToggleFavorite}
+          favoritePending={favoritePending}
         />
       ))}
     </div>

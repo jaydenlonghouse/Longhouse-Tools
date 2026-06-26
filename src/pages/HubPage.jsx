@@ -3,11 +3,13 @@ import { X } from 'lucide-react'
 import ToolGrid from '../components/ToolGrid.jsx'
 import ToolCatalogToolbar from '../components/ToolCatalogToolbar.jsx'
 import { useTools } from '../hooks/useTools.js'
+import { useToolFavorites } from '../hooks/useToolFavorites.js'
 import { captureDeniedFromUrl, consumeDeniedNotice, formatToolSlug } from '../lib/deniedUtils.js'
-import { catalogResultLabel, filterCatalogTools } from '../lib/toolCatalogUtils.js'
+import { catalogResultLabel, filterAndSortCatalogTools } from '../lib/toolCatalogUtils.js'
 
 export default function HubPage({ onRequestFeature, onSubmitBug }) {
   const { data: tools, isLoading, error } = useTools()
+  const { favoriteIds, isFavorited, toggleFavorite, isToggling } = useToolFavorites()
   const [deniedSlug, setDeniedSlug] = useState(null)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
@@ -25,8 +27,8 @@ export default function HubPage({ onRequestFeature, onSubmitBug }) {
   }, [deniedSlug, tools])
 
   const filteredTools = useMemo(
-    () => filterCatalogTools(tools, category, query),
-    [tools, category, query],
+    () => filterAndSortCatalogTools(tools, category, query, favoriteIds),
+    [tools, category, query, favoriteIds],
   )
 
   const hasActiveFilters = category !== 'all' || query.trim().length > 0
@@ -100,6 +102,9 @@ export default function HubPage({ onRequestFeature, onSubmitBug }) {
         category={category}
         onClearFilters={clearFilters}
         showKindBadge={category === 'all'}
+        isFavorited={isFavorited}
+        onToggleFavorite={toggleFavorite}
+        favoritePending={isToggling}
       />
     </>
   )
