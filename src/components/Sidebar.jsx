@@ -299,8 +299,8 @@ export default function Sidebar({
       ) : null}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 h-screen max-h-screen shrink-0 transition-[width,transform] duration-200 ease-in-out lg:relative lg:translate-x-0 ${widthClass} w-60 ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-50 flex h-dvh max-h-dvh flex-col transition-[width,transform] duration-200 ease-in-out ${widthClass} w-60 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <aside className="flex h-full w-full flex-col overflow-hidden bg-brand-800">

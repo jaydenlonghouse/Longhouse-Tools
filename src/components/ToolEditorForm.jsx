@@ -208,7 +208,7 @@ export default function ToolEditorForm({
   const hasPreview = Boolean(activePreviewUrl)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="min-w-0 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-ink-900">
           {mode === 'edit' ? 'Edit entry' : 'New entry'}
@@ -439,7 +439,7 @@ export default function ToolEditorForm({
         </div>
       ) : null}
 
-      <fieldset disabled={formOptionsLoading || Boolean(formOptionsError)}>
+      <fieldset disabled={formOptionsLoading || Boolean(formOptionsError)} className="min-w-0">
         <legend className="text-sm font-medium text-ink-800">Departments</legend>
         <p className="mt-1 text-xs text-ink-500">
           Users must belong to one of these departments to access this tool (unless Leadership or
@@ -448,7 +448,7 @@ export default function ToolEditorForm({
         {formOptionsLoading ? (
           <p className="mt-3 text-sm text-ink-500">Loading departments…</p>
         ) : null}
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 flex min-w-0 flex-wrap gap-2">
           {departments.map(d => {
             const checked = selectedDeptIds.includes(d.id)
             return (
@@ -473,7 +473,7 @@ export default function ToolEditorForm({
         </div>
       </fieldset>
 
-      <fieldset disabled={formOptionsLoading || Boolean(formOptionsError)}>
+      <fieldset disabled={formOptionsLoading || Boolean(formOptionsError)} className="min-w-0">
         <legend className="text-sm font-medium text-ink-800">Access tiers</legend>
         <p className="mt-1 text-xs text-ink-500">{TOOL_TIER_HELP}</p>
         {formOptionsLoading ? (

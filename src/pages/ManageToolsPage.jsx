@@ -202,7 +202,7 @@ export default function ManageToolsPage({ onNavigate }) {
       : toolToFormValues(editingTool)
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl min-w-0">
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
@@ -238,8 +238,8 @@ export default function ManageToolsPage({ onNavigate }) {
         </div>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-brand-100 bg-white shadow-sm">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
+        <section className="min-w-0 rounded-2xl border border-brand-100 bg-white shadow-sm lg:sticky lg:top-8 lg:max-h-[calc(100dvh-4rem)] lg:overflow-y-auto">
           <div className="border-b border-brand-100 px-4 py-3">
             <h2 className="text-sm font-semibold text-ink-900">All tools</h2>
           </div>
@@ -311,7 +311,7 @@ export default function ManageToolsPage({ onNavigate }) {
         </section>
 
         {panel ? (
-          <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
+          <section className="min-w-0 rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
             <ToolEditorForm
               key={panel.mode === 'edit' ? panel.toolId : 'create'}
               mode={panel.mode}

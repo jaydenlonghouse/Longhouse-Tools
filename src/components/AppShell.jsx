@@ -22,7 +22,7 @@ export default function AppShell({ activeView, onNavigate, children }) {
   }, [collapsed])
 
   return (
-    <div className="flex h-screen max-h-screen overflow-y-hidden">
+    <div className="h-dvh max-h-dvh overflow-hidden">
       <Sidebar
         activeView={activeView}
         onNavigate={onNavigate}
@@ -31,7 +31,11 @@ export default function AppShell({ activeView, onNavigate, children }) {
         onToggleCollapse={() => setCollapsed(c => !c)}
         onMobileToggle={open => setMobileOpen(typeof open === 'boolean' ? open : o => !o)}
       />
-      <main className="min-h-0 min-w-0 flex-1 overflow-y-auto bg-brand-50">
+      <main
+        className={`h-dvh max-h-dvh overflow-y-auto overflow-x-hidden bg-brand-50 transition-[margin] duration-200 ease-in-out ${
+          collapsed ? 'lg:ml-[4.5rem]' : 'lg:ml-60'
+        }`}
+      >
         <div className="px-4 pb-8 pt-16 lg:px-8 lg:pt-8">{children}</div>
       </main>
     </div>
