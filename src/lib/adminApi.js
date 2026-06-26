@@ -16,6 +16,7 @@ import {
   deleteMockTool,
 } from './mockAdminStore.js'
 import { TOOL_TIER_SLUGS } from './roles.js'
+import { normalizeCreatorFields } from './creators.js'
 
 export async function fetchMyAccess() {
   if (useOfflineDemo) {
@@ -138,6 +139,7 @@ export async function fetchToolsForAdmin() {
       thumbnail_url,
       is_active,
       created_by,
+      creator_type,
       kind,
       tool_departments ( department_id ),
       tool_access_tiers ( role_id )
@@ -160,6 +162,7 @@ export async function fetchToolsForAdmin() {
     thumbnail_url: tool.thumbnail_url,
     is_active: tool.is_active,
     created_by: tool.created_by,
+    creator_type: tool.creator_type ?? 'user',
     kind: tool.kind ?? 'tool',
     department_ids: (tool.tool_departments ?? []).map(td => td.department_id),
     tier_role_ids: (tool.tool_access_tiers ?? []).map(tat => tat.role_id),
@@ -317,6 +320,7 @@ export async function createTool({
   }
 
   const supabase = getSupabase()
+  const creator = normalizeCreatorFields(createdBy)
 
   const { data: tool, error: toolError } = await supabase
     .from('tools')
@@ -328,7 +332,8 @@ export async function createTool({
       icon: icon || 'wrench',
       sort_order: sortOrder ?? 0,
       thumbnail_url: thumbnailUrl?.trim() || null,
-      created_by: createdBy,
+      created_by: creator.created_by,
+      creator_type: creator.creator_type,
       is_active: true,
       kind: kind === 'gpt' ? 'gpt' : 'tool',
     })
@@ -403,6 +408,7 @@ export async function updateTool({
   }
 
   const supabase = getSupabase()
+  const creator = normalizeCreatorFields(createdBy)
 
   const { error: toolError } = await supabase
     .from('tools')
@@ -414,7 +420,8 @@ export async function updateTool({
       icon: icon || 'wrench',
       sort_order: sortOrder ?? 0,
       thumbnail_url: thumbnailUrl?.trim() || null,
-      created_by: createdBy,
+      created_by: creator.created_by,
+      creator_type: creator.creator_type,
       is_active: isActive !== false,
       kind: kind === 'gpt' ? 'gpt' : 'tool',
     })

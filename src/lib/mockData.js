@@ -109,6 +109,6 @@ export const MOCK_TOOLS = [
     sort_order: 4,
     kind: 'gpt',
     departments: ['Advertising', 'Social Media'],
-    created_by_name: 'Alex Kim',
+    created_by_name: 'Longhouse Team',
   },
 ]

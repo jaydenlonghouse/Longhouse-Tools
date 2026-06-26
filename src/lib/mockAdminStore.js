@@ -4,6 +4,7 @@ import {
   MOCK_ROLES,
   MOCK_TOOLS,
 } from './mockData.js'
+import { CREATOR_TEAM_LABEL, isTeamCreator } from './creators.js'
 
 const assignmentsByUser = new Map()
 
@@ -28,6 +29,7 @@ const mockToolMeta = new Map([
     {
       is_active: true,
       created_by: 'mock-user-2',
+      creator_type: 'user',
       department_ids: ['dept-advertising', 'dept-operations'],
       tier_role_ids: ['role-specialist', 'role-results-manager', 'role-department-head'],
     },
@@ -37,6 +39,7 @@ const mockToolMeta = new Map([
     {
       is_active: true,
       created_by: 'mock-user-id',
+      creator_type: 'user',
       department_ids: ['dept-sales', 'dept-operations'],
       tier_role_ids: ['role-specialist', 'role-results-manager'],
     },
@@ -46,6 +49,7 @@ const mockToolMeta = new Map([
     {
       is_active: true,
       created_by: 'mock-user-3',
+      creator_type: 'user',
       department_ids: ['dept-operations', 'dept-branding'],
       tier_role_ids: ['role-specialist', 'role-results-manager', 'role-department-head', 'role-leadership'],
     },
@@ -54,7 +58,8 @@ const mockToolMeta = new Map([
     '4',
     {
       is_active: true,
-      created_by: 'mock-user-2',
+      created_by: null,
+      creator_type: 'team',
       department_ids: ['dept-advertising', 'dept-social-media'],
       tier_role_ids: ['role-specialist', 'role-results-manager', 'role-department-head'],
     },
@@ -66,6 +71,7 @@ function getMockToolMeta(toolId) {
     mockToolMeta.get(toolId) ?? {
       is_active: true,
       created_by: 'mock-user-id',
+      creator_type: 'user',
       department_ids: [],
       tier_role_ids: [],
     }
@@ -118,6 +124,7 @@ export function getMockAdminTools() {
       thumbnail_url: tool.thumbnail_url ?? null,
       is_active: meta.is_active,
       created_by: meta.created_by,
+      creator_type: meta.creator_type ?? 'user',
       kind: tool.kind ?? 'tool',
       department_ids: meta.department_ids,
       tier_role_ids: meta.tier_role_ids,
@@ -143,7 +150,10 @@ export function addMockTool({
   const deptNames = (departmentIds ?? [])
     .map(did => MOCK_DEPARTMENTS.find(d => d.id === did)?.name)
     .filter(Boolean)
-  const creator = MOCK_PROFILES.find(p => p.id === createdBy)
+  const creatorFields = isTeamCreator(createdBy)
+    ? { creator_type: 'team', created_by: null }
+    : { creator_type: 'user', created_by: createdBy }
+  const creator = MOCK_PROFILES.find(p => p.id === creatorFields.created_by)
 
   const tool = {
     id,
@@ -155,14 +165,17 @@ export function addMockTool({
     sort_order: sortOrder ?? MOCK_TOOLS.length + 1,
     kind: kind === 'gpt' ? 'gpt' : 'tool',
     departments: deptNames,
-    created_by_name: creator?.display_name || creator?.email || 'Demo User',
+    created_by_name: creatorFields.creator_type === 'team'
+      ? CREATOR_TEAM_LABEL
+      : creator?.display_name || creator?.email || 'Demo User',
     thumbnail_url: thumbnailUrl || null,
   }
 
   MOCK_TOOLS.push(tool)
   mockToolMeta.set(id, {
     is_active: isActive !== false,
-    created_by: createdBy,
+    created_by: creatorFields.created_by,
+    creator_type: creatorFields.creator_type,
     department_ids: departmentIds ?? [],
     tier_role_ids: tierRoleIds ?? [],
   })
@@ -193,7 +206,10 @@ export function updateMockTool(
   const deptNames = (departmentIds ?? [])
     .map(did => MOCK_DEPARTMENTS.find(d => d.id === did)?.name)
     .filter(Boolean)
-  const creator = MOCK_PROFILES.find(p => p.id === createdBy)
+  const creatorFields = isTeamCreator(createdBy)
+    ? { creator_type: 'team', created_by: null }
+    : { creator_type: 'user', created_by: createdBy }
+  const creator = MOCK_PROFILES.find(p => p.id === creatorFields.created_by)
 
   MOCK_TOOLS[index] = {
     ...MOCK_TOOLS[index],
@@ -205,13 +221,16 @@ export function updateMockTool(
     sort_order: sortOrder ?? MOCK_TOOLS[index].sort_order,
     kind: kind === 'gpt' ? 'gpt' : 'tool',
     departments: deptNames,
-    created_by_name: creator?.display_name || creator?.email || MOCK_TOOLS[index].created_by_name,
+    created_by_name: creatorFields.creator_type === 'team'
+      ? CREATOR_TEAM_LABEL
+      : creator?.display_name || creator?.email || MOCK_TOOLS[index].created_by_name,
     thumbnail_url: thumbnailUrl || null,
   }
 
   mockToolMeta.set(toolId, {
     is_active: isActive !== false,
-    created_by: createdBy,
+    created_by: creatorFields.created_by,
+    creator_type: creatorFields.creator_type,
     department_ids: departmentIds ?? [],
     tier_role_ids: tierRoleIds ?? [],
   })

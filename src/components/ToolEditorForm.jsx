@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ImagePlus } from 'lucide-react'
 import { slugifyToolName, TOOL_TIER_HELP } from '../lib/roles.js'
+import { CREATOR_TEAM_LABEL, CREATOR_TEAM_VALUE } from '../lib/creators.js'
 import ToolThumbnail from './ToolThumbnail.jsx'
 
 export const ICON_OPTIONS = [
@@ -107,7 +108,7 @@ export default function ToolEditorForm({
       name.trim() &&
       slug.trim() &&
       url.trim() &&
-      createdBy &&
+      (createdBy === CREATOR_TEAM_VALUE || createdBy) &&
       selectedDeptIds.length > 0 &&
       selectedTierIds.length > 0,
     [name, slug, url, createdBy, selectedDeptIds, selectedTierIds],
@@ -198,9 +199,10 @@ export default function ToolEditorForm({
     () => ({
       name: name.trim() || 'Tool preview',
       url: '',
+      kind,
       thumbnail_url: activePreviewUrl,
     }),
-    [name, activePreviewUrl],
+    [name, activePreviewUrl, kind],
   )
 
   const hasPreview = Boolean(activePreviewUrl)
@@ -391,6 +393,16 @@ export default function ToolEditorForm({
             </div>
             <ToolThumbnail tool={previewTool} />
           </div>
+        ) : kind === 'gpt' ? (
+          <div className="mt-3">
+            <p className="mb-2 text-xs font-medium text-ink-600">Card preview</p>
+            <ToolThumbnail tool={{ ...previewTool, thumbnail_url: activePreviewUrl || null }} />
+            {!activePreviewUrl ? (
+              <p className="mt-2 text-xs text-ink-500">
+                Using the default ChatGPT image until you upload a custom preview.
+              </p>
+            ) : null}
+          </div>
         ) : (
           <div className="mt-3 rounded-xl border border-dashed border-brand-200 bg-brand-50/40 px-4 py-8 text-center">
             <ImagePlus size={28} className="mx-auto text-brand-400" aria-hidden />
@@ -411,6 +423,7 @@ export default function ToolEditorForm({
           required
         >
           <option value="">Select a user…</option>
+          <option value={CREATOR_TEAM_VALUE}>{CREATOR_TEAM_LABEL}</option>
           {profiles.map(p => (
             <option key={p.id} value={p.id}>
               {p.display_name ? `${p.display_name} — ${p.email}` : p.email}

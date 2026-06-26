@@ -13,6 +13,7 @@ import {
   updateTool,
   uploadToolThumbnail,
 } from '../lib/adminApi.js'
+import { CREATOR_TEAM_LABEL, creatorSelectValue } from '../lib/creators.js'
 
 function toolToFormValues(tool) {
   if (!tool) return undefined
@@ -25,7 +26,7 @@ function toolToFormValues(tool) {
     sortOrder: tool.sort_order,
     thumbnailUrl: tool.thumbnail_url ?? '',
     isActive: tool.is_active !== false,
-    createdBy: tool.created_by ?? '',
+    createdBy: creatorSelectValue(tool),
     departmentIds: tool.department_ids ?? [],
     tierRoleIds: tool.tier_role_ids ?? [],
     kind: tool.kind ?? 'tool',
@@ -101,8 +102,9 @@ export default function ManageToolsPage({ onNavigate }) {
     setErrorMsg(null)
   }
 
-  function creatorLabel(userId) {
-    const p = profiles.find(x => x.id === userId)
+  function creatorLabel(tool) {
+    if (tool.creator_type === 'team') return CREATOR_TEAM_LABEL
+    const p = profiles.find(x => x.id === tool.created_by)
     return p?.display_name || p?.email || null
   }
 
@@ -270,9 +272,9 @@ export default function ManageToolsPage({ onNavigate }) {
                           </span>
                         </div>
                         <p className="truncate text-xs text-ink-500">{tool.slug}</p>
-                        {creatorLabel(tool.created_by) ? (
+                        {creatorLabel(tool) ? (
                           <p className="mt-0.5 truncate text-xs text-ink-400">
-                            Created by {creatorLabel(tool.created_by)}
+                            Created by {creatorLabel(tool)}
                           </p>
                         ) : null}
                       </div>

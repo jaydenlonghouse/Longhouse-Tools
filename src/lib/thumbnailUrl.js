@@ -1,5 +1,9 @@
-/** Returns the stored thumbnail URL for a tool, or null if none is set. */
+export const GPT_DEFAULT_THUMBNAIL_URL = '/gpt-default.png'
+
+/** Returns the stored thumbnail URL, GPT default image, or null. */
 export function getToolThumbnailUrl(tool) {
   const url = tool?.thumbnail_url?.trim()
-  return url || null
+  if (url) return url
+  if (tool?.kind === 'gpt') return GPT_DEFAULT_THUMBNAIL_URL
+  return null
 }
