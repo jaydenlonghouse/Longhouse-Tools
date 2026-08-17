@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTools } from '../hooks/useTools.js'
 import { submitBugReport } from '../lib/bugsApi.js'
 
-export default function SubmitBugPage({ onBack }) {
+export default function SubmitBugPage({
+  onBack,
+  preselectedToolId = null,
+  onPreselectConsumed,
+}) {
   const { user } = useAuth()
   const { data: tools, isLoading: toolsLoading } = useTools()
-  const [toolId, setToolId] = useState('')
+  const [toolId, setToolId] = useState(() => preselectedToolId ?? '')
   const [description, setDescription] = useState('')
   const [consoleLogs, setConsoleLogs] = useState('')
   const [pageUrl, setPageUrl] = useState(() =>
@@ -17,6 +21,14 @@ export default function SubmitBugPage({ onBack }) {
   const [previewUrl, setPreviewUrl] = useState(null)
   const [status, setStatus] = useState('idle')
   const [errorMsg, setErrorMsg] = useState(null)
+
+  useEffect(() => {
+    if (!preselectedToolId || !tools?.length) return
+    if (tools.some(t => t.id === preselectedToolId)) {
+      setToolId(preselectedToolId)
+      onPreselectConsumed?.()
+    }
+  }, [preselectedToolId, tools, onPreselectConsumed])
 
   function handleScreenshotChange(e) {
     const file = e.target.files?.[0]
