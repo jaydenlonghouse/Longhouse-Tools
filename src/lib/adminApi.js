@@ -14,9 +14,12 @@ import {
   getMockAdminTools,
   updateMockTool,
   deleteMockTool,
+  getMockPlatforms,
+  addMockPlatform,
 } from './mockAdminStore.js'
 import { TOOL_TIER_SLUGS } from './roles.js'
 import { normalizeCreatorFields } from './creators.js'
+import { DEFAULT_PLATFORM_ICON } from './platforms.js'
 
 export async function fetchMyAccess() {
   if (useOfflineDemo) {
@@ -87,20 +90,61 @@ export async function fetchProfiles() {
   return { data: data ?? [], error }
 }
 
+export async function fetchPlatforms() {
+  if (useOfflineDemo) {
+    return { data: getMockPlatforms(), error: null }
+  }
+
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from('platforms')
+    .select('id, slug, name, icon_path, sort_order')
+    .order('sort_order')
+
+  return { data: data ?? [], error }
+}
+
+export async function createPlatform({ name, slug, iconPath }) {
+  if (useOfflineDemo) {
+    const platform = addMockPlatform({
+      name,
+      slug,
+      iconPath: iconPath || DEFAULT_PLATFORM_ICON,
+    })
+    return { data: platform, error: null }
+  }
+
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from('platforms')
+    .insert({
+      name: name.trim(),
+      slug: slug.trim(),
+      icon_path: iconPath?.trim() || DEFAULT_PLATFORM_ICON,
+      sort_order: 999,
+    })
+    .select('id, slug, name, icon_path, sort_order')
+    .single()
+
+  return { data, error }
+}
+
 export async function fetchAdminFormOptions() {
   if (useOfflineDemo) {
     return {
       data: {
         departments: MOCK_DEPARTMENTS,
         tier_roles: MOCK_ROLES.filter(r => TOOL_TIER_SLUGS.includes(r.slug)),
+        platforms: getMockPlatforms(),
       },
       error: null,
     }
   }
 
-  const [deptResult, rolesResult] = await Promise.all([
+  const [deptResult, rolesResult, platformsResult] = await Promise.all([
     fetchDepartments(),
     fetchRoles({ toolTiersOnly: true }),
+    fetchPlatforms(),
   ])
 
   if (deptResult.error) {
@@ -109,11 +153,15 @@ export async function fetchAdminFormOptions() {
   if (rolesResult.error) {
     return { data: null, error: rolesResult.error }
   }
+  if (platformsResult.error) {
+    return { data: null, error: platformsResult.error }
+  }
 
   return {
     data: {
       departments: deptResult.data,
       tier_roles: rolesResult.data,
+      platforms: platformsResult.data,
     },
     error: null,
   }
@@ -142,7 +190,13 @@ export async function fetchToolsForAdmin() {
       creator_type,
       kind,
       tool_departments ( department_id ),
-      tool_access_tiers ( role_id )
+      tool_access_tiers ( role_id ),
+      tool_platforms (
+        platform_id,
+        label,
+        link_url,
+        sort_order
+      )
     `,
     )
     .order('sort_order')
@@ -166,6 +220,13 @@ export async function fetchToolsForAdmin() {
     kind: tool.kind ?? 'tool',
     department_ids: (tool.tool_departments ?? []).map(td => td.department_id),
     tier_role_ids: (tool.tool_access_tiers ?? []).map(tat => tat.role_id),
+    platform_links: (tool.tool_platforms ?? [])
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      .map(tp => ({
+        platformId: tp.platform_id,
+        label: tp.label ?? '',
+        linkUrl: tp.link_url ?? '',
+      })),
   }))
 
   return { data: rows, error: null }
@@ -215,6 +276,34 @@ async function syncToolRelations(supabase, toolId, departmentIds, tierRoleIds) {
   }
 
   return null
+}
+
+async function syncToolPlatforms(supabase, toolId, platformLinks = []) {
+  const { error: deleteError } = await supabase
+    .from('tool_platforms')
+    .delete()
+    .eq('tool_id', toolId)
+
+  if (deleteError) {
+    return deleteError
+  }
+
+  const rows = (platformLinks ?? []).filter(link => link.platformId)
+  if (!rows.length) {
+    return null
+  }
+
+  const { error: insertError } = await supabase.from('tool_platforms').insert(
+    rows.map((link, index) => ({
+      tool_id: toolId,
+      platform_id: link.platformId,
+      label: link.label?.trim() ?? '',
+      link_url: link.linkUrl?.trim() ?? '',
+      sort_order: index,
+    })),
+  )
+
+  return insertError
 }
 
 export async function fetchUserDepartmentRoles(userId) {
@@ -301,6 +390,7 @@ export async function createTool({
   tierRoleIds,
   createdBy,
   kind = 'tool',
+  platformLinks = [],
 }) {
   if (useOfflineDemo) {
     const tool = addMockTool({
@@ -315,6 +405,7 @@ export async function createTool({
       tierRoleIds,
       createdBy,
       kind,
+      platformLinks,
     })
     return { data: tool, error: null }
   }
@@ -368,6 +459,11 @@ export async function createTool({
     }
   }
 
+  const platformError = await syncToolPlatforms(supabase, tool.id, platformLinks)
+  if (platformError) {
+    return { data: null, error: platformError }
+  }
+
   return { data: tool, error: null }
 }
 
@@ -385,6 +481,7 @@ export async function updateTool({
   createdBy,
   isActive,
   kind = 'tool',
+  platformLinks = [],
 }) {
   if (useOfflineDemo) {
     const tool = updateMockTool(toolId, {
@@ -400,6 +497,7 @@ export async function updateTool({
       createdBy,
       isActive,
       kind,
+      platformLinks,
     })
     if (!tool) {
       return { data: null, error: { message: 'Tool not found.' } }
@@ -434,6 +532,11 @@ export async function updateTool({
   const relError = await syncToolRelations(supabase, toolId, departmentIds, tierRoleIds)
   if (relError) {
     return { data: null, error: relError }
+  }
+
+  const platformError = await syncToolPlatforms(supabase, toolId, platformLinks)
+  if (platformError) {
+    return { data: null, error: platformError }
   }
 
   return { data: { id: toolId }, error: null }

@@ -3,6 +3,7 @@ import { AlertCircle, ImagePlus } from 'lucide-react'
 import { slugifyToolName, TOOL_TIER_HELP } from '../lib/roles.js'
 import { CREATOR_TEAM_LABEL, CREATOR_TEAM_VALUE } from '../lib/creators.js'
 import ToolThumbnail from './ToolThumbnail.jsx'
+import ToolPlatformsEditor from './ToolPlatformsEditor.jsx'
 
 export const ICON_OPTIONS = [
   'bar-chart-3',
@@ -30,6 +31,7 @@ const EMPTY = {
   departmentIds: [],
   tierRoleIds: [],
   kind: 'tool',
+  platformLinks: [],
 }
 
 export default function ToolEditorForm({
@@ -46,6 +48,8 @@ export default function ToolEditorForm({
   onCancel,
   onDelete,
   deletePending = false,
+  platforms = [],
+  onPlatformsRefresh,
 }) {
   const [name, setName] = useState(EMPTY.name)
   const [slug, setSlug] = useState(EMPTY.slug)
@@ -64,6 +68,7 @@ export default function ToolEditorForm({
   const [selectedDeptIds, setSelectedDeptIds] = useState(EMPTY.departmentIds)
   const [selectedTierIds, setSelectedTierIds] = useState(EMPTY.tierRoleIds)
   const [kind, setKind] = useState(EMPTY.kind)
+  const [platformLinks, setPlatformLinks] = useState(EMPTY.platformLinks)
 
   useEffect(() => {
     const v = { ...EMPTY, ...initialValues }
@@ -87,6 +92,15 @@ export default function ToolEditorForm({
     setSelectedDeptIds(v.departmentIds ?? [])
     setSelectedTierIds(v.tierRoleIds ?? [])
     setKind(v.kind === 'gpt' ? 'gpt' : 'tool')
+    setPlatformLinks(
+      Array.isArray(v.platformLinks)
+        ? v.platformLinks.map(link => ({
+            platformId: link.platformId ?? '',
+            label: link.label ?? '',
+            linkUrl: link.linkUrl ?? '',
+          }))
+        : [],
+    )
   }, [initialValues, mode])
 
   useEffect(() => {
@@ -174,6 +188,7 @@ export default function ToolEditorForm({
       departmentIds: selectedDeptIds,
       tierRoleIds: selectedTierIds,
       kind,
+      platformLinks,
     })
   }
 
@@ -504,6 +519,14 @@ export default function ToolEditorForm({
           })}
         </div>
       </fieldset>
+
+      <ToolPlatformsEditor
+        platforms={platforms}
+        platformLinks={platformLinks}
+        onChange={setPlatformLinks}
+        disabled={formOptionsLoading || Boolean(formOptionsError) || status === 'submitting'}
+        onPlatformsRefresh={onPlatformsRefresh}
+      />
 
       {status === 'error' && errorMsg ? (
         <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">

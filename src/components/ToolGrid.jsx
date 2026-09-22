@@ -36,6 +36,7 @@ export default function ToolGrid({
   isFavorited,
   onToggleFavorite,
   favoritePending = false,
+  showPlatforms = false,
 }) {
   if (isLoading) {
     return (
@@ -80,6 +81,7 @@ export default function ToolGrid({
           isFavorited={isFavorited?.(tool.id) ?? false}
           onToggleFavorite={onToggleFavorite}
           favoritePending={favoritePending}
+          showPlatforms={showPlatforms}
         />
       ))}
     </div>

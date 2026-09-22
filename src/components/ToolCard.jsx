@@ -1,11 +1,13 @@
 import { ExternalLink, Heart } from 'lucide-react'
 import DepartmentTags from './DepartmentTags.jsx'
 import ToolThumbnail from './ToolThumbnail.jsx'
+import ToolPlatformsUsed from './ToolPlatformsUsed.jsx'
 
 export default function ToolCard({
   tool,
   onRequestFeature,
   showKindBadge = false,
+  showPlatforms = false,
   isFavorited = false,
   onToggleFavorite,
   favoritePending = false,
@@ -56,12 +58,7 @@ export default function ToolCard({
         <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600 line-clamp-3">
           {tool.description}
         </p>
-        {tool.created_by_name ? (
-          <p className="mt-3 text-xs text-ink-500">
-            Created by{' '}
-            <span className="font-medium text-ink-600">{tool.created_by_name}</span>
-          </p>
-        ) : null}
+        {showPlatforms ? <ToolPlatformsUsed platforms={tool.platforms} /> : null}
         <div className="mt-5 flex items-stretch gap-2">
           <button
             type="button"

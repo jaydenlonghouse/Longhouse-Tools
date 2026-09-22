@@ -62,6 +62,13 @@ export const MOCK_ACCESS = {
   ],
 }
 
+export const MOCK_PLATFORMS = [
+  { id: 'plat-github', slug: 'github', name: 'GitHub', icon_path: '/platform-icons/github.png', sort_order: 1 },
+  { id: 'plat-supabase', slug: 'supabase', name: 'Supabase', icon_path: '/platform-icons/supabase.png', sort_order: 2 },
+  { id: 'plat-vercel', slug: 'vercel', name: 'Vercel', icon_path: '/platform-icons/vercel.png', sort_order: 3 },
+  { id: 'plat-netlify', slug: 'netlify', name: 'Netlify', icon_path: '/platform-icons/netlify.png', sort_order: 4 },
+]
+
 export const MOCK_TOOLS = [
   {
     id: '1',
@@ -74,6 +81,22 @@ export const MOCK_TOOLS = [
     kind: 'tool',
     departments: ['Advertising', 'Operations'],
     created_by_name: 'Alex Kim',
+    platforms: [
+      {
+        slug: 'github',
+        name: 'GitHub',
+        icon_path: '/platform-icons/github.png',
+        label: 'jaydenlonghouse/Longhouse-Tools',
+        link_url: 'https://github.com/jaydenlonghouse/Longhouse-Tools',
+      },
+      {
+        slug: 'supabase',
+        name: 'Supabase',
+        icon_path: '/platform-icons/supabase.png',
+        label: 'longhouse-tools',
+        link_url: 'https://supabase.com/dashboard',
+      },
+    ],
   },
   {
     id: '2',

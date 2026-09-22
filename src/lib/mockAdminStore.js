@@ -1,10 +1,38 @@
 import {
   MOCK_DEPARTMENTS,
+  MOCK_PLATFORMS,
   MOCK_PROFILES,
   MOCK_ROLES,
   MOCK_TOOLS,
 } from './mockData.js'
 import { CREATOR_TEAM_LABEL, isTeamCreator } from './creators.js'
+
+const mockPlatforms = [...MOCK_PLATFORMS]
+
+function hubPlatformsFromLinks(platformLinks = []) {
+  return platformLinks
+    .map(link => {
+      const platform = mockPlatforms.find(p => p.id === link.platformId)
+      if (!platform) return null
+      return {
+        slug: platform.slug,
+        name: platform.name,
+        icon_path: platform.icon_path,
+        label: link.label ?? '',
+        link_url: link.linkUrl ?? '',
+      }
+    })
+    .filter(Boolean)
+}
+
+function syncMockToolHubPlatforms(toolId, platformLinks) {
+  const index = MOCK_TOOLS.findIndex(t => t.id === toolId)
+  if (index === -1) return
+  MOCK_TOOLS[index] = {
+    ...MOCK_TOOLS[index],
+    platforms: hubPlatformsFromLinks(platformLinks),
+  }
+}
 
 const assignmentsByUser = new Map()
 
@@ -32,6 +60,18 @@ const mockToolMeta = new Map([
       creator_type: 'user',
       department_ids: ['dept-advertising', 'dept-operations'],
       tier_role_ids: ['role-specialist', 'role-results-manager', 'role-department-head'],
+      platform_links: [
+        {
+          platformId: 'plat-github',
+          label: 'jaydenlonghouse/Longhouse-Tools',
+          linkUrl: 'https://github.com/jaydenlonghouse/Longhouse-Tools',
+        },
+        {
+          platformId: 'plat-supabase',
+          label: 'longhouse-tools',
+          linkUrl: 'https://supabase.com/dashboard',
+        },
+      ],
     },
   ],
   [
@@ -74,8 +114,26 @@ function getMockToolMeta(toolId) {
       creator_type: 'user',
       department_ids: [],
       tier_role_ids: [],
+      platform_links: [],
     }
   )
+}
+
+export function getMockPlatforms() {
+  return [...mockPlatforms].sort((a, b) => a.sort_order - b.sort_order)
+}
+
+export function addMockPlatform({ name, slug, iconPath }) {
+  const id = `plat-${Date.now()}`
+  const platform = {
+    id,
+    slug,
+    name,
+    icon_path: iconPath || '/platform-icons/default.png',
+    sort_order: mockPlatforms.length + 1,
+  }
+  mockPlatforms.push(platform)
+  return platform
 }
 
 export function getMockUserAssignments(userId) {
@@ -128,6 +186,7 @@ export function getMockAdminTools() {
       kind: tool.kind ?? 'tool',
       department_ids: meta.department_ids,
       tier_role_ids: meta.tier_role_ids,
+      platform_links: meta.platform_links ?? [],
     }
   }).sort((a, b) => a.sort_order - b.sort_order)
 }
@@ -145,6 +204,7 @@ export function addMockTool({
   createdBy,
   isActive = true,
   kind = 'tool',
+  platformLinks = [],
 }) {
   const id = `mock-tool-${Date.now()}`
   const deptNames = (departmentIds ?? [])
@@ -178,7 +238,10 @@ export function addMockTool({
     creator_type: creatorFields.creator_type,
     department_ids: departmentIds ?? [],
     tier_role_ids: tierRoleIds ?? [],
+    platform_links: platformLinks ?? [],
   })
+
+  syncMockToolHubPlatforms(id, platformLinks ?? [])
 
   return tool
 }
@@ -198,6 +261,7 @@ export function updateMockTool(
     createdBy,
     isActive,
     kind = 'tool',
+    platformLinks = [],
   },
 ) {
   const index = MOCK_TOOLS.findIndex(t => t.id === toolId)
@@ -233,7 +297,10 @@ export function updateMockTool(
     creator_type: creatorFields.creator_type,
     department_ids: departmentIds ?? [],
     tier_role_ids: tierRoleIds ?? [],
+    platform_links: platformLinks ?? [],
   })
+
+  syncMockToolHubPlatforms(toolId, platformLinks ?? [])
 
   return MOCK_TOOLS[index]
 }

@@ -30,6 +30,7 @@ function toolToFormValues(tool) {
     departmentIds: tool.department_ids ?? [],
     tierRoleIds: tool.tier_role_ids ?? [],
     kind: tool.kind ?? 'tool',
+    platformLinks: tool.platform_links ?? [],
   }
 }
 
@@ -140,6 +141,7 @@ export default function ManageToolsPage({ onNavigate }) {
       createdBy: values.createdBy,
       isActive: values.isActive,
       kind: values.kind,
+      platformLinks: values.platformLinks ?? [],
     }
 
     const { error } =
@@ -331,6 +333,10 @@ export default function ManageToolsPage({ onNavigate }) {
                   : undefined
               }
               deletePending={deletingToolId === panel.toolId}
+              platforms={formOptions?.platforms ?? []}
+              onPlatformsRefresh={async () => {
+                await queryClient.invalidateQueries({ queryKey: ['adminFormOptions'] })
+              }}
             />
           </section>
         ) : (
