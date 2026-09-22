@@ -67,6 +67,10 @@ export const MOCK_PLATFORMS = [
   { id: 'plat-supabase', slug: 'supabase', name: 'Supabase', icon_path: '/platform-icons/supabase.png', sort_order: 2 },
   { id: 'plat-vercel', slug: 'vercel', name: 'Vercel', icon_path: '/platform-icons/vercel.png', sort_order: 3 },
   { id: 'plat-netlify', slug: 'netlify', name: 'Netlify', icon_path: '/platform-icons/netlify.png', sort_order: 4 },
+  { id: 'plat-chatgpt', slug: 'chatgpt', name: 'ChatGPT', icon_path: '/platform-icons/chatgpt.png', sort_order: 5 },
+  { id: 'plat-claude', slug: 'claude', name: 'Claude', icon_path: '/platform-icons/claude.png', sort_order: 6 },
+  { id: 'plat-gemini', slug: 'gemini', name: 'Gemini', icon_path: '/platform-icons/gemini.png', sort_order: 7 },
+  { id: 'plat-airtable', slug: 'airtable', name: 'Airtable', icon_path: '/platform-icons/airtable.png', sort_order: 8 },
 ]
 
 export const MOCK_TOOLS = [

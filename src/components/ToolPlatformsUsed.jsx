@@ -1,10 +1,28 @@
 import { platformIconSrc } from '../lib/platforms.js'
+import AppTooltip from './AppTooltip.jsx'
+
+function platformTooltipContent(platform) {
+  const detail = platform.label?.trim()
+  const name = platform.name || platform.slug || 'Platform'
+
+  if (detail && detail !== name) {
+    return (
+      <span className="block text-left">
+        <span className="block text-[11px] font-semibold uppercase tracking-wide text-brand-200">
+          {name}
+        </span>
+        <span className="mt-0.5 block text-sm font-medium leading-snug text-white">{detail}</span>
+      </span>
+    )
+  }
+
+  return name
+}
 
 function PlatformIconLink({ platform }) {
-  const label = platform.label?.trim() || platform.name
   const href = platform.link_url?.trim()
   const iconSrc = platformIconSrc(platform)
-  const title = label ? `${platform.name}: ${label}` : platform.name
+  const tooltip = platformTooltipContent(platform)
 
   const image = (
     <img
@@ -16,29 +34,33 @@ function PlatformIconLink({ platform }) {
     />
   )
 
+  const wrapperClass =
+    'inline-flex rounded-md p-0.5 transition-colors hover:bg-brand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500'
+
+  const ariaDetail = platform.label?.trim() || platform.name
+
   if (href) {
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={title}
-        aria-label={title}
-        className="inline-flex rounded-md p-0.5 transition-colors hover:bg-brand-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-      >
-        {image}
-      </a>
+      <AppTooltip content={tooltip}>
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${platform.name}: ${ariaDetail}`}
+          className={wrapperClass}
+        >
+          {image}
+        </a>
+      </AppTooltip>
     )
   }
 
   return (
-    <span
-      title={title}
-      className="inline-flex rounded-md p-0.5"
-      aria-label={title}
-    >
-      {image}
-    </span>
+    <AppTooltip content={tooltip}>
+      <span aria-label={ariaDetail} className={wrapperClass} tabIndex={0}>
+        {image}
+      </span>
+    </AppTooltip>
   )
 }
 

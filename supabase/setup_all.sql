@@ -1307,7 +1307,11 @@ values
   ('github', 'GitHub', '/platform-icons/github.png', 1),
   ('supabase', 'Supabase', '/platform-icons/supabase.png', 2),
   ('vercel', 'Vercel', '/platform-icons/vercel.png', 3),
-  ('netlify', 'Netlify', '/platform-icons/netlify.png', 4)
+  ('netlify', 'Netlify', '/platform-icons/netlify.png', 4),
+  ('chatgpt', 'ChatGPT', '/platform-icons/chatgpt.png', 5),
+  ('claude', 'Claude', '/platform-icons/claude.png', 6),
+  ('gemini', 'Gemini', '/platform-icons/gemini.png', 7),
+  ('airtable', 'Airtable', '/platform-icons/airtable.png', 8)
 on conflict (slug) do update set
   name = excluded.name,
   icon_path = excluded.icon_path,
@@ -1435,3 +1439,16 @@ as $$
 $$;
 
 grant execute on function public.get_tools_for_user() to authenticated;
+
+-- ========== 015_platform_catalog_expand.sql ==========
+
+insert into public.platforms (slug, name, icon_path, sort_order)
+values
+  ('chatgpt', 'ChatGPT', '/platform-icons/chatgpt.png', 5),
+  ('claude', 'Claude', '/platform-icons/claude.png', 6),
+  ('gemini', 'Gemini', '/platform-icons/gemini.png', 7),
+  ('airtable', 'Airtable', '/platform-icons/airtable.png', 8)
+on conflict (slug) do update set
+  name = excluded.name,
+  icon_path = excluded.icon_path,
+  sort_order = excluded.sort_order;

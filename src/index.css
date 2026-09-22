@@ -33,3 +33,37 @@
     max-width: 100%;
   }
 }
+
+/* Tippy.js — hub platform icons and other tooltips */
+.tippy-box[data-theme~='longhouse'] {
+  background-color: #02163d;
+  color: #fff;
+  font-family: theme('fontFamily.sans');
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.35;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 4px 14px rgb(2 22 61 / 0.22),
+    0 0 0 1px rgb(255 255 255 / 0.06);
+}
+
+.tippy-box[data-theme~='longhouse'] > .tippy-content {
+  padding: 0.5rem 0.625rem;
+}
+
+.tippy-box[data-theme~='longhouse'][data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: #02163d;
+}
+
+.tippy-box[data-theme~='longhouse'][data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: #02163d;
+}
+
+.tippy-box[data-theme~='longhouse'][data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: #02163d;
+}
+
+.tippy-box[data-theme~='longhouse'][data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: #02163d;
+}

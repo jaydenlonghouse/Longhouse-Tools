@@ -27,7 +27,11 @@ values
   ('github', 'GitHub', '/platform-icons/github.png', 1),
   ('supabase', 'Supabase', '/platform-icons/supabase.png', 2),
   ('vercel', 'Vercel', '/platform-icons/vercel.png', 3),
-  ('netlify', 'Netlify', '/platform-icons/netlify.png', 4)
+  ('netlify', 'Netlify', '/platform-icons/netlify.png', 4),
+  ('chatgpt', 'ChatGPT', '/platform-icons/chatgpt.png', 5),
+  ('claude', 'Claude', '/platform-icons/claude.png', 6),
+  ('gemini', 'Gemini', '/platform-icons/gemini.png', 7),
+  ('airtable', 'Airtable', '/platform-icons/airtable.png', 8)
 on conflict (slug) do update set
   name = excluded.name,
   icon_path = excluded.icon_path,
